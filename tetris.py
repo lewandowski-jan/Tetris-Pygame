@@ -26,4 +26,23 @@ class Block(object):
 class Shape(object):
     blocks = [4]
 
+    def __init__(self, x, y, shape):
+        if shape == "I":
+            print("OK")
+        elif shape == "L":
+            print("OK")
+        elif shape == "T":
+            print("OK")
+        elif shape == "O":
+            print("OK")
+        elif shape == "ML":
+            print("OK")
+        elif shape == "Z":
+            print("OK")
+        elif shape == "MZ":
+            print("OK")
+        else:
+            print("Wrong shape type: " + shape)
+
+
 

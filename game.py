@@ -9,6 +9,7 @@ def main():
     while window.get_running():
         window.clear()
         window.check_close()
+        window.draw_ui()
         window.update()
 
 
