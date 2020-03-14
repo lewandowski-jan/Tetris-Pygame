@@ -27,7 +27,7 @@ class Button(object):
             self.text = self.font.render("PLAY", True, const.BLACK)
 
         self.textRect = self.text.get_rect()
-        self.textRect.center = (600, 145)
+        self.textRect.center = (600, 125)
         screen.blit(self.text, self.textRect)
 
         if self.x <= mx <= self.x + self.width and self.y <= my <= self.y + self.height and mousedown:

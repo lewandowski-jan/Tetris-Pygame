@@ -28,7 +28,7 @@ class View(object):
         self.text = self.font.render("Tetris", True, const.BLACK)
         self.textRect = self.text.get_rect()
         self.textRect.center = (600, 45)
-        self.but = button.Button(480, 100, 240, 80, "PLAY")
+        self.but = button.Button(480, 80, 240, 80, "PLAY")
         self.font40 = pg.font.Font('Minecrafter.Reg.ttf', 40)
 
     # sets screen width to value
@@ -111,10 +111,10 @@ class View(object):
         # draws Next Shape text
         nexttext = self.font40.render("next shape", True, const.BLACK)
         nexttextrect = nexttext.get_rect()
-        nexttextrect.center = (600, 240)
+        nexttextrect.center = (600, 220)
         self.screen.blit(nexttext, nexttextrect)
 
         # draws 3 rects for next shapes
         for i in range(3):
-            rect = pg.Rect(480, 260 + i * 180, 240, 160)
+            rect = pg.Rect(480, 240 + i * 180, 240, 160)
             pg.draw.rect(self.screen, const.BLACK, rect)
