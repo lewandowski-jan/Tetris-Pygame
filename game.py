@@ -1,5 +1,8 @@
 import view
+import pygame as pg
+import const
 
+clock = pg.time.Clock()
 
 # main function
 def main():
@@ -7,6 +10,7 @@ def main():
 
     # game loop
     while window.get_running():
+        clock.tick(const.FPS)
         window.clear()
         window.ui()
         window.check_close()

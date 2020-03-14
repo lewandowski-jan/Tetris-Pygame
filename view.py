@@ -122,7 +122,7 @@ class View(object):
     # draws shapes
     def draw_shapes(self):
         board = tetris.Board()
-        board.update()
+        board.update(self.isPaused)
 
         for shape in board.get_shapes():
             for block in shape.get_blocks():
