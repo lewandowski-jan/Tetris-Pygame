@@ -3,6 +3,7 @@ import const
 import shapes
 
 count = 0
+count1 = 0
 
 # single block class in tetris game
 class Block(object):
@@ -95,37 +96,49 @@ class Shape(object):
 
 class Board(object):
     board = []
-    shapes = []
+    shapesnums = [None] * 4
 
     def __init__(self):
         for i in range(const.SIZE_X):
             for j in range(const.SIZE_Y):
                 self.board.append(0)
+                self.shapes = []
+
+        first = False
+
+        while len(self.shapes) < 4:
+            num = randrange(0, 6)
+            if len(self.shapes) == 0:
+                self.shapesnums[0] = num
+                self.shapes.append(Shape(num, 120, 0))
+            elif len(self.shapes) == 1:
+                self.shapesnums[1] = num
+                self.shapes.append(Shape(num, 520, 240))
+            elif len(self.shapes) == 2:
+                self.shapesnums[2] = num
+                self.shapes.append(Shape(num, 520, 420))
+            elif len(self.shapes) == 3:
+                self.shapesnums[3] = num
+                self.shapes.append(Shape(num, 520, 600))
 
     def get_shapes(self):
         return self.shapes
 
     def update(self, isPaused):
-        print(len(self.shapes))
-        while len(self.shapes) < 4:
-            num = randrange(0, 6)
-            if len(self.shapes) == 0:
-                self.shapes.append(Shape(num, 120, 0))
-            elif len(self.shapes) == 1:
-                self.shapes.append(Shape(num, 520, 240))
-            elif len(self.shapes) == 2:
-                self.shapes.append(Shape(num, 520, 420))
-            elif len(self.shapes) == 3:
-                self.shapes.append(Shape(num, 520, 600))
 
         if isPaused:
             global count
             count += 1
-            if count >= const.FPS/2:
-                print(self.shapes)
+            if count >= const.FPS/4:
                 for block in self.shapes[0].get_blocks():
-                    if block.get_y() >= 800:
-                        self.shapes.pop(0)
-                        self.shapes[0].update_blocks(120, 0)
+                    if block.get_y() == 800:
+                        self.shapes.clear()
+                        self.shapesnums.pop(0)
+                        self.shapesnums.append(randrange(0, 6))
+                        self.shapes.append(Shape(self.shapesnums[0], 120, -160))
+                        self.shapes.append(Shape(self.shapesnums[1], 520, 240))
+                        self.shapes.append(Shape(self.shapesnums[2], 520, 420))
+                        self.shapes.append(Shape(self.shapesnums[3], 520, 600))
+                        break
                     block.set_y(block.get_y() + const.GRID)
                 count = 0

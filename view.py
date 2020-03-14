@@ -14,6 +14,7 @@ class View(object):
         self.mouseUp = True
         self.isPaused = False
         self.clicked = False
+        self.board = tetris.Board()
 
         # initialize pygame
         pg.init()
@@ -121,10 +122,10 @@ class View(object):
 
     # draws shapes
     def draw_shapes(self):
-        board = tetris.Board()
-        board.update(self.isPaused)
 
-        for shape in board.get_shapes():
+        self.board.update(self.isPaused)
+
+        for shape in self.board.get_shapes():
             for block in shape.get_blocks():
                 rect = pg.Rect(block.get_x(), block.get_y(), block.get_size(), block.get_size())
                 pg.draw.rect(self.screen, block.get_color(), rect)
