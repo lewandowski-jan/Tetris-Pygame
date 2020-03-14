@@ -10,6 +10,7 @@ def main():
         window.clear()
         window.ui()
         window.check_close()
+        window.draw_shapes()
         window.update()
 
 

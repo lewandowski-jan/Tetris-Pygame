@@ -118,3 +118,13 @@ class View(object):
         for i in range(3):
             rect = pg.Rect(480, 240 + i * 180, 240, 160)
             pg.draw.rect(self.screen, const.BLACK, rect)
+
+    # draws shapes
+    def draw_shapes(self):
+        board = tetris.Board()
+        board.update()
+
+        for shape in board.get_shapes():
+            for block in shape.get_blocks():
+                rect = pg.Rect(block.get_x(), block.get_y(), block.get_size(), block.get_size())
+                pg.draw.rect(self.screen, block.get_color(), rect)
