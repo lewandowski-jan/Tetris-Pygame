@@ -1,6 +1,7 @@
 import pygame as pg
 import const
 import tetris
+import button
 
 class View(object):
     # constructor
@@ -9,6 +10,10 @@ class View(object):
         self.height = height
         self.name = name
         self.running = True
+        self.mouseDown = False
+        self.mouseUp = True
+        self.isPaused = False
+        self.clicked = False
 
         # initialize pygame
         pg.init()
@@ -23,6 +28,7 @@ class View(object):
         self.text = self.font.render("Tetris", True, const.BLACK)
         self.textRect = self.text.get_rect()
         self.textRect.center = (600, 45)
+        self.but = button.Button(480, 100, 240, 80, "PLAY")
 
     # sets screen width to value
     def set_width(self, width):
@@ -56,6 +62,13 @@ class View(object):
     def get_running(self):
         return self.running
 
+    # sets isPaused to value
+    def change_isPaused(self):
+        if self.isPaused:
+            self.isPaused = False
+        else:
+            self.isPaused = True
+
     # clears screen
     def clear(self):
         self.screen.fill((200,200,200))
@@ -69,14 +82,30 @@ class View(object):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.running = False
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.mouseDown = True
+                self.mouseUp = False
+            elif event.type == pg.MOUSEBUTTONUP:
+                self.mouseDown = False
+                self.mouseUp = True
 
     # draws grid shape
-    def draw_ui(self):
+    def ui(self):
         for i in range(10):
             for j in range(20):
                 rect = pg.Rect(1 + i * const.GRID, j * const.GRID, const.GRID - 1, const.GRID - 1)
                 pg.draw.rect(self.screen, const.BLACK, rect)
 
         self.screen.blit(self.text, self.textRect)
+
+        if self.but.update(self.screen, self.isPaused, self.mouseDown) and not self.clicked:
+            self.change_isPaused()
+            self.clicked = True
+
+        if self.mouseUp:
+            self.clicked = False
+
+
+
 
 
