@@ -92,25 +92,29 @@ class View(object):
 
     # draws ui
     def ui(self):
+        # draws grid on left side
         for i in range(10):
             for j in range(20):
                 rect = pg.Rect(1 + i * const.GRID, j * const.GRID, const.GRID - 1, const.GRID - 1)
                 pg.draw.rect(self.screen, const.BLACK, rect)
 
+        # draws Tetris text
         self.screen.blit(self.text, self.textRect)
 
+        # draws button and updates self.isPaused
         if self.but.update(self.screen, self.isPaused, self.mouseDown) and not self.clicked:
             self.change_isPaused()
             self.clicked = True
-
         if self.mouseUp:
             self.clicked = False
 
+        # draws Next Shape text
         nexttext = self.font40.render("next shape", True, const.BLACK)
         nexttextrect = nexttext.get_rect()
         nexttextrect.center = (600, 240)
         self.screen.blit(nexttext, nexttextrect)
 
+        # draws 3 rects for next shapes
         for i in range(3):
             rect = pg.Rect(480, 260 + i * 180, 240, 160)
             pg.draw.rect(self.screen, const.BLACK, rect)

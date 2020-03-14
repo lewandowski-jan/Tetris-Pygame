@@ -1,5 +1,6 @@
 import view
 
+
 # main function
 def main():
     window = view.View(view.const.WIN_WIDTH, view.const.WIN_HEIGHT, view.const.WIN_NAME)
