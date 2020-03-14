@@ -14,7 +14,7 @@ def main():
         clock.tick(const.FPS)
         window.clear()
         window.ui()
-        window.check_close()
+        window.check_events()
         window.draw_shapes()
         window.update()
 

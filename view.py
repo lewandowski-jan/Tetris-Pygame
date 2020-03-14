@@ -15,6 +15,10 @@ class View(object):
         self.isPaused = False
         self.clicked = False
         self.board = tetris.Board()
+        self.keyl = False
+        self.keyu = False
+        self.keyr = False
+        self.keyup = True
 
         # initialize pygame
         pg.init()
@@ -80,7 +84,7 @@ class View(object):
         pg.display.update()
 
     # checks for close event
-    def check_close(self):
+    def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.running = False
@@ -90,6 +94,21 @@ class View(object):
             elif event.type == pg.MOUSEBUTTONUP:
                 self.mouseDown = False
                 self.mouseUp = True
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_LEFT:
+                    self.keyl = True
+                    self.keyup = False
+                if event.key == pg.K_UP:
+                    self.keyu = True
+                    self.keyup = False
+                if event.key == pg.K_RIGHT:
+                    self.keyr = True
+                    self.keyup = False
+            elif event.type == pg.KEYUP:
+                self.keyl = False
+                self.keyu = False
+                self.keyr = False
+                self.keyup = True
 
     # draws ui
     def ui(self):
@@ -123,7 +142,7 @@ class View(object):
     # draws shapes
     def draw_shapes(self):
 
-        self.board.update(self.isPaused)
+        self.board.update(self.isPaused, self.keyu, self.keyup)
 
         for shape in self.board.get_shapes():
             for block in shape.get_blocks():

@@ -48,6 +48,12 @@ class Shape(object):
     def set_y(self, y):
         self.y = y
 
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
+
     def __init__(self, shape, x, y):
         self.x = x
         self.y = y
@@ -84,14 +90,12 @@ class Shape(object):
                 if self.array[0][i * 4 + j] == 1:
                     self.blocks.append(Block(self.x + j * const.GRID, self.y + i * const.GRID, self.color))
 
-    def update_blocks(self, x, y):
-        if self.x != x and self.y != y:
-            self.x = x
-            self.y = y
-            for i in range(4):
-                for j in range(4):
-                    if self.array[0][i * 4 + j] == 1:
-                        self.blocks.append(Block(self.x + j * const.GRID, self.y + i * const.GRID, self.color))
+    def turn(self, num):
+        self.blocks.clear()
+        for i in range(4):
+            for j in range(4):
+                if self.array[num][i * 4 + j] == 1:
+                    self.blocks.append(Block(self.x + j * const.GRID, self.y + i * const.GRID, self.color))
 
 
 class Board(object):
@@ -103,6 +107,8 @@ class Board(object):
             for j in range(const.SIZE_Y):
                 self.board.append(0)
                 self.shapes = []
+                self.turn = 0
+                self.pressed = False
 
         first = False
 
@@ -124,14 +130,28 @@ class Board(object):
     def get_shapes(self):
         return self.shapes
 
-    def update(self, isPaused):
+    def update(self, isPaused, keyu, keyup):
 
         if isPaused:
+
+            if keyu and not self.pressed:
+                if self.turn < 3:
+                    self.turn += 1
+                    self.shapes[0].turn(self.turn)
+                else:
+                    self.turn = 0
+                    self.shapes[0].turn(self.turn)
+                self.pressed = True
+                print(self.turn)
+
+            if keyup:
+                self.pressed = False
+
             global count
             count += 1
-            if count >= const.FPS/4:
+            if count >= const.FPS/2:
                 for block in self.shapes[0].get_blocks():
-                    if block.get_y() == 800:
+                    if block.get_y() == const.WIN_HEIGHT - const.GRID:
                         self.shapes.clear()
                         self.shapesnums.pop(0)
                         self.shapesnums.append(randrange(0, 6))
@@ -141,4 +161,7 @@ class Board(object):
                         self.shapes.append(Shape(self.shapesnums[3], 520, 600))
                         break
                     block.set_y(block.get_y() + const.GRID)
+
+                self.shapes[0].set_y(self.shapes[0].get_y() + const.GRID)
+
                 count = 0
