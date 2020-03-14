@@ -29,6 +29,7 @@ class View(object):
         self.textRect = self.text.get_rect()
         self.textRect.center = (600, 45)
         self.but = button.Button(480, 100, 240, 80, "PLAY")
+        self.font40 = pg.font.Font('Minecrafter.Reg.ttf', 40)
 
     # sets screen width to value
     def set_width(self, width):
@@ -89,7 +90,7 @@ class View(object):
                 self.mouseDown = False
                 self.mouseUp = True
 
-    # draws grid shape
+    # draws ui
     def ui(self):
         for i in range(10):
             for j in range(20):
@@ -105,7 +106,11 @@ class View(object):
         if self.mouseUp:
             self.clicked = False
 
+        nexttext = self.font40.render("next shape", True, const.BLACK)
+        nexttextrect = nexttext.get_rect()
+        nexttextrect.center = (600, 240)
+        self.screen.blit(nexttext, nexttextrect)
 
-
-
-
+        for i in range(3):
+            rect = pg.Rect(480, 260 + i * 180, 240, 160)
+            pg.draw.rect(self.screen, const.BLACK, rect)
