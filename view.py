@@ -142,7 +142,7 @@ class View(object):
     # draws shapes
     def draw_shapes(self):
 
-        self.board.update(self.isPaused, self.keyu, self.keyup)
+        self.board.update(self.isPaused, self.keyu, self.keyup, self.keyl, self.keyr)
 
         for shape in self.board.get_shapes():
             for block in shape.get_blocks():

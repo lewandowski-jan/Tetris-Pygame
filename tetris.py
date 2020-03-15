@@ -60,6 +60,7 @@ class Shape(object):
         self.array = []
         self.color = (0, 0, 0)
         self.blocks = []
+        self.turnpossible = True
 
         if shape == 0:
             self.array = shapes.i
@@ -91,11 +92,24 @@ class Shape(object):
                     self.blocks.append(Block(self.x + j * const.GRID, self.y + i * const.GRID, self.color))
 
     def turn(self, num):
-        self.blocks.clear()
+        temp = []
         for i in range(4):
             for j in range(4):
                 if self.array[num][i * 4 + j] == 1:
-                    self.blocks.append(Block(self.x + j * const.GRID, self.y + i * const.GRID, self.color))
+                    temp.append(Block(self.x + j * const.GRID, self.y + i * const.GRID, self.color))
+
+        for block in temp:
+            if block.get_x() <= 1 or block.get_x() >= 360:
+                self.turnpossible = False
+            else:
+                self.turnpossible = True
+
+        if self.turnpossible:
+            self.blocks.clear()
+            for i in range(4):
+                for j in range(4):
+                    if self.array[num][i * 4 + j] == 1:
+                        self.blocks.append(Block(self.x + j * const.GRID, self.y + i * const.GRID, self.color))
 
 
 class Board(object):
@@ -109,6 +123,8 @@ class Board(object):
                 self.shapes = []
                 self.turn = 0
                 self.pressed = False
+                self.possibleleft = True
+                self.possibleright = True
 
         first = False
 
@@ -130,9 +146,21 @@ class Board(object):
     def get_shapes(self):
         return self.shapes
 
-    def update(self, isPaused, keyu, keyup):
+    def update(self, isPaused, keyu, keyup, keyl, keyr):
 
         if isPaused:
+
+            for block in self.shapes[0].get_blocks():
+                if block.get_x() <= 1:
+                    self.possibleleft = False
+                    break
+                else:
+                    self.possibleleft = True
+                if block.get_x() >= 360:
+                    self.possibleright = False
+                    break
+                else:
+                    self.possibleright = True
 
             if keyu and not self.pressed:
                 if self.turn < 3:
@@ -142,7 +170,18 @@ class Board(object):
                     self.turn = 0
                     self.shapes[0].turn(self.turn)
                 self.pressed = True
-                print(self.turn)
+
+            if keyl and not self.pressed and self.possibleleft:
+                for block in self.shapes[0].get_blocks():
+                    block.set_x(block.get_x() - const.GRID)
+                self.shapes[0].set_x(self.shapes[0].get_x() - const.GRID)
+                self.pressed = True
+
+            if keyr and not self.pressed and self.possibleright:
+                for block in self.shapes[0].get_blocks():
+                    block.set_x(block.get_x() + const.GRID)
+                self.shapes[0].set_x(self.shapes[0].get_x() + const.GRID)
+                self.pressed = True
 
             if keyup:
                 self.pressed = False
@@ -151,6 +190,15 @@ class Board(object):
             count += 1
             if count >= const.FPS/2:
                 for block in self.shapes[0].get_blocks():
+
+                    if block.get_x() <= 0:
+                        for bl in self.shapes[0].get_blocks():
+                            bl.set_x(bl.get_x() + const.GRID * 3)
+
+                    if block.get_x() >= 362:
+                        for bl in self.shapes[0].get_blocks():
+                            bl.set_x(bl.get_x() - const.GRID * 3)
+
                     if block.get_y() == const.WIN_HEIGHT - const.GRID:
                         self.shapes.clear()
                         self.shapesnums.pop(0)
