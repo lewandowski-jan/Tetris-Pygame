@@ -147,17 +147,17 @@ class Board(object):
         while len(self.shapes) < 4:
             num = randrange(0, 6)
             if len(self.shapes) == 0:
-                self.shapesnums[0] = 0
-                self.shapes.append(Shape(0, 120, 0))
+                self.shapesnums[0] = num
+                self.shapes.append(Shape(self.shapesnums[0], 120, 0))
             elif len(self.shapes) == 1:
                 self.shapesnums[1] = num
-                self.shapes.append(Shape(num, 520, 240))
+                self.shapes.append(Shape(self.shapesnums[1], 520, 240))
             elif len(self.shapes) == 2:
                 self.shapesnums[2] = num
-                self.shapes.append(Shape(num, 520, 420))
+                self.shapes.append(Shape(self.shapesnums[2], 520, 420))
             elif len(self.shapes) == 3:
                 self.shapesnums[3] = num
-                self.shapes.append(Shape(num, 520, 600))
+                self.shapes.append(Shape(self.shapesnums[3], 520, 600))
 
     def get_shapes(self):
         return self.shapes
