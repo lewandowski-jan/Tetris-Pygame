@@ -15,9 +15,10 @@ def main():
         window.clear()
         window.ui()
         window.check_events()
-        window.draw_shapes()
+        if window.draw_shapes() == False:
+            print("YOU LOST!")
+            break
         window.update()
-
 
 if __name__ == "__main__":
     main()

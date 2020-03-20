@@ -141,7 +141,8 @@ class View(object):
 
     # draws shapes
     def draw_shapes(self):
-        self.board.update(self.isPaused, self.keyu, self.keyup, self.keyl, self.keyr)
+        if not self.board.update(self.isPaused, self.keyu, self.keyup, self.keyl, self.keyr):
+            return False
 
         for shape in self.board.get_shapes():
             for block in shape.get_blocks():
@@ -168,3 +169,5 @@ class View(object):
                         pg.draw.rect(self.screen, const.GREEN, rect)
                     elif shape == 6:
                         pg.draw.rect(self.screen, const.RED, rect)
+
+        return True

@@ -143,6 +143,8 @@ class Board(object):
         self.pressed = False
         self.possibleleft = True
         self.possibleright = True
+        self.lastIndexes = [0, 0, 0, 0]
+        self.lastshape = 0
 
         first = False
 
@@ -176,9 +178,25 @@ class Board(object):
                 if self.board[j * const.SIZE_X + i] == 7:
                     self.board[j * const.SIZE_X + i] = -1
 
+    def update_last(self):
+        self.lastIndexes[0] = int((self.shapes[0].get_blocks()[0].get_y() / const.GRID) * const.SIZE_X + (
+                self.shapes[0].get_blocks()[0].get_x() - 1) / const.GRID)
+        self.lastIndexes[1] = int((self.shapes[0].get_blocks()[1].get_y() / const.GRID) * const.SIZE_X + (
+                self.shapes[0].get_blocks()[1].get_x() - 1) / const.GRID)
+        self.lastIndexes[2] = int((self.shapes[0].get_blocks()[2].get_y() / const.GRID) * const.SIZE_X + (
+                self.shapes[0].get_blocks()[2].get_x() - 1) / const.GRID)
+        self.lastIndexes[3] = int((self.shapes[0].get_blocks()[3].get_y() / const.GRID) * const.SIZE_X + (
+                self.shapes[0].get_blocks()[3].get_x() - 1) / const.GRID)
+
+        self.lastshape = self.shapes[0].get_shape()
+
     def update(self, isPaused, keyu, keyup, keyl, keyr):
 
         if isPaused:
+            for i in range(9):
+                if self.board[i] != -1 and self.board[i] != 7:
+                    return False
+
             for block in self.shapes[0].get_blocks():
                 if block.get_x() <= 1:
                     self.possibleleft = False
@@ -195,29 +213,41 @@ class Board(object):
             self.clear_board7()
 
             for block in self.shapes[0].get_blocks():
-                print("1.  ", end="")
-                print(block.get_x(), end=" ")
-                print(block.get_y(), end=" id:")
-                print(int((block.get_y() / const.GRID) * const.SIZE_X + (block.get_x() - 1) / const.GRID))
+                index = int((block.get_y() / const.GRID) * const.SIZE_X + (block.get_x() - 1) / const.GRID)
+                if 0 <= index < const.SIZE_X * const.SIZE_Y:
+                    if self.board[index] == -1:
+                        self.board[index] = 7
+                    else:
+                        for ind in self.lastIndexes:
+                            self.board[ind] = self.lastshape
 
-            for block in self.shapes[0].get_blocks():
-                self.board[int((block.get_y() / const.GRID) * const.SIZE_X + (block.get_x() - 1) / const.GRID)] = 7
+                        self.shapes.clear()
+                        self.shapesnums.pop(0)
+                        self.shapesnums.append(randrange(0, 6))
+                        self.shapes.append(Shape(self.shapesnums[0], 120, -160))
+                        self.shapes.append(Shape(self.shapesnums[1], 520, 240))
+                        self.shapes.append(Shape(self.shapesnums[2], 520, 420))
+                        self.shapes.append(Shape(self.shapesnums[3], 520, 600))
 
-            print(self.board)
+                        break
 
             if keyu and not self.pressed:
+                self.update_last()
+
                 self.shapes[0].turn()
                 self.pressed = True
 
             if keyl and not self.pressed and self.possibleleft:
+                self.update_last()
+
                 for block in self.shapes[0].get_blocks():
                     block.set_x(block.get_x() - const.GRID)
-                    print("###  ", end="")
-                    print(block.get_x())
                 self.shapes[0].set_x(self.shapes[0].get_x() - const.GRID)
                 self.pressed = True
 
             if keyr and not self.pressed and self.possibleright:
+                self.update_last()
+
                 for block in self.shapes[0].get_blocks():
                     block.set_x(block.get_x() + const.GRID)
                 self.shapes[0].set_x(self.shapes[0].get_x() + const.GRID)
@@ -228,7 +258,7 @@ class Board(object):
 
             global count
             count += 1
-            if count >= const.FPS/2:
+            if count >= const.FPS/4:
                 for block in self.shapes[0].get_blocks():
 
                     # when shape hits bottom
@@ -242,17 +272,20 @@ class Board(object):
                         self.shapes.clear()
                         self.shapesnums.pop(0)
                         self.shapesnums.append(randrange(0, 6))
-                        self.shapes.append(Shape(self.shapesnums[0], 120, 0))
+                        self.shapes.append(Shape(self.shapesnums[0], 120, -160))
                         self.shapes.append(Shape(self.shapesnums[1], 520, 240))
                         self.shapes.append(Shape(self.shapesnums[2], 520, 420))
                         self.shapes.append(Shape(self.shapesnums[3], 520, 600))
 
                         break
 
-                    # moves block one lower
+                self.update_last()
+
+                # moves block one lower
+                for block in self.shapes[0].get_blocks():
                     block.set_y(block.get_y() + const.GRID)
                 self.shapes[0].set_y(self.shapes[0].get_y() + const.GRID)
 
                 count = 0
 
-
+        return True
