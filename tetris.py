@@ -3,7 +3,7 @@ import const
 import shapes
 
 count = 0
-count1 = 0
+
 
 # single block class in tetris game
 class Block(object):
@@ -54,6 +54,9 @@ class Shape(object):
     def get_y(self):
         return self.y
 
+    def get_shape(self):
+        return self.shape
+
     def __init__(self, shape, x, y):
         self.x = x
         self.y = y
@@ -62,26 +65,27 @@ class Shape(object):
         self.blocks = []
         self.turnpossible = True
         self.spin = 0
+        self.shape = shape
 
-        if shape == 0:
+        if self.shape == 0:
             self.array = shapes.i
             self.color = const.LIGHTBLUE
-        elif shape == 1:
+        elif self.shape == 1:
             self.array = shapes.l
             self.color = const.BLUE
-        elif shape == 2:
+        elif self.shape == 2:
             self.array = shapes.t
             self.color = const.PURPLE
-        elif shape == 3:
+        elif self.shape == 3:
             self.array = shapes.o
             self.color = const.YELLOW
-        elif shape == 4:
+        elif self.shape == 4:
             self.array = shapes.ml
             self.color = const.ORANGE
-        elif shape == 5:
+        elif self.shape == 5:
             self.array = shapes.z
             self.color = const.GREEN
-        elif shape == 6:
+        elif self.shape == 6:
             self.array = shapes.mz
             self.color = const.RED
         else:
@@ -130,19 +134,20 @@ class Shape(object):
 
 
 class Board(object):
-    board = []
     shapesnums = [None] * 4
 
     def __init__(self):
-        for i in range(const.SIZE_X):
-            for j in range(const.SIZE_Y):
-                self.board.append(0)
-                self.shapes = []
-                self.pressed = False
-                self.possibleleft = True
-                self.possibleright = True
+
+        self.shapes = []
+        self.board = []
+        self.pressed = False
+        self.possibleleft = True
+        self.possibleright = True
 
         first = False
+
+        for i in range(const.SIZE_Y * const.SIZE_X):
+            self.board.append(-1)
 
         while len(self.shapes) < 4:
             num = randrange(0, 6)
@@ -162,21 +167,43 @@ class Board(object):
     def get_shapes(self):
         return self.shapes
 
+    def get_board(self):
+        return self.board
+
+    def clear_board7(self):
+        for i in range(const.SIZE_X):
+            for j in range(const.SIZE_Y):
+                if self.board[j * const.SIZE_X + i] == 7:
+                    self.board[j * const.SIZE_X + i] = -1
+
     def update(self, isPaused, keyu, keyup, keyl, keyr):
 
         if isPaused:
-
             for block in self.shapes[0].get_blocks():
                 if block.get_x() <= 1:
                     self.possibleleft = False
                     break
                 else:
                     self.possibleleft = True
-                if block.get_x() >= 360:
+
+                if block.get_x() >= 361:
                     self.possibleright = False
                     break
                 else:
                     self.possibleright = True
+
+            self.clear_board7()
+
+            for block in self.shapes[0].get_blocks():
+                print("1.  ", end="")
+                print(block.get_x(), end=" ")
+                print(block.get_y(), end=" id:")
+                print(int((block.get_y() / const.GRID) * const.SIZE_X + (block.get_x() - 1) / const.GRID))
+
+            for block in self.shapes[0].get_blocks():
+                self.board[int((block.get_y() / const.GRID) * const.SIZE_X + (block.get_x() - 1) / const.GRID)] = 7
+
+            print(self.board)
 
             if keyu and not self.pressed:
                 self.shapes[0].turn()
@@ -185,6 +212,8 @@ class Board(object):
             if keyl and not self.pressed and self.possibleleft:
                 for block in self.shapes[0].get_blocks():
                     block.set_x(block.get_x() - const.GRID)
+                    print("###  ", end="")
+                    print(block.get_x())
                 self.shapes[0].set_x(self.shapes[0].get_x() - const.GRID)
                 self.pressed = True
 
@@ -199,30 +228,31 @@ class Board(object):
 
             global count
             count += 1
-            if count >= const.FPS:
+            if count >= const.FPS/2:
                 for block in self.shapes[0].get_blocks():
 
-                    if block.get_x() <= 0:
-                        for bl in self.shapes[0].get_blocks():
-                            bl.set_x(bl.get_x() + const.GRID * 3)
-                        self.shapes[0].set_x(self.shapes[0].get_x() + const.GRID * 3)
-
-                    if block.get_x() >= 362:
-                        for bl in self.shapes[0].get_blocks():
-                            bl.set_x(bl.get_x() - const.GRID * 3)
-                        self.shapes[0].set_x(self.shapes[0].get_x() - const.GRID * 3)
-
+                    # when shape hits bottom
                     if block.get_y() == const.WIN_HEIGHT - const.GRID:
+
+                        for i in range(const.SIZE_X):
+                            for j in range(const.SIZE_Y):
+                                if self.board[j * const.SIZE_X + i] == 7:
+                                    self.board[j * const.SIZE_X + i] = self.shapes[0].get_shape()
+
                         self.shapes.clear()
                         self.shapesnums.pop(0)
                         self.shapesnums.append(randrange(0, 6))
-                        self.shapes.append(Shape(self.shapesnums[0], 120, -160))
+                        self.shapes.append(Shape(self.shapesnums[0], 120, 0))
                         self.shapes.append(Shape(self.shapesnums[1], 520, 240))
                         self.shapes.append(Shape(self.shapesnums[2], 520, 420))
                         self.shapes.append(Shape(self.shapesnums[3], 520, 600))
-                        break
-                    block.set_y(block.get_y() + const.GRID)
 
+                        break
+
+                    # moves block one lower
+                    block.set_y(block.get_y() + const.GRID)
                 self.shapes[0].set_y(self.shapes[0].get_y() + const.GRID)
 
                 count = 0
+
+

@@ -141,10 +141,30 @@ class View(object):
 
     # draws shapes
     def draw_shapes(self):
-
         self.board.update(self.isPaused, self.keyu, self.keyup, self.keyl, self.keyr)
 
         for shape in self.board.get_shapes():
             for block in shape.get_blocks():
                 rect = pg.Rect(block.get_x(), block.get_y(), block.get_size(), block.get_size())
                 pg.draw.rect(self.screen, block.get_color(), rect)
+
+        for i in range(const.SIZE_X):
+            for j in range(const.SIZE_Y):
+                shape = self.board.get_board()[j * const.SIZE_X + i]
+                if 0 <= shape <= 6:
+                    rect = pg.Rect(i * const.GRID + 1, j * const.GRID, const.GRID - 1, const.GRID - 1)
+
+                    if shape == 0:
+                        pg.draw.rect(self.screen, const.LIGHTBLUE, rect)
+                    elif shape == 1:
+                        pg.draw.rect(self.screen, const.BLUE, rect)
+                    elif shape == 2:
+                        pg.draw.rect(self.screen, const.PURPLE, rect)
+                    elif shape == 3:
+                        pg.draw.rect(self.screen, const.YELLOW, rect)
+                    elif shape == 4:
+                        pg.draw.rect(self.screen, const.ORANGE, rect)
+                    elif shape == 5:
+                        pg.draw.rect(self.screen, const.GREEN, rect)
+                    elif shape == 6:
+                        pg.draw.rect(self.screen, const.RED, rect)
