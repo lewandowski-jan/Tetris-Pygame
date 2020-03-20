@@ -166,18 +166,22 @@ class Board(object):
                 self.shapesnums[3] = num
                 self.shapes.append(Shape(self.shapesnums[3], 520, 600))
 
+    #returns list of shapes
     def get_shapes(self):
         return self.shapes
 
+    # returns board list
     def get_board(self):
         return self.board
 
+    # clears the board from 7s which means moving shape
     def clear_board7(self):
         for i in range(const.SIZE_X):
             for j in range(const.SIZE_Y):
                 if self.board[j * const.SIZE_X + i] == 7:
                     self.board[j * const.SIZE_X + i] = -1
 
+    # saves last position of moving shape
     def update_last(self):
         self.lastIndexes[0] = int((self.shapes[0].get_blocks()[0].get_y() / const.GRID) * const.SIZE_X + (
                 self.shapes[0].get_blocks()[0].get_x() - 1) / const.GRID)
@@ -189,6 +193,17 @@ class Board(object):
                 self.shapes[0].get_blocks()[3].get_x() - 1) / const.GRID)
 
         self.lastshape = self.shapes[0].get_shape()
+
+    # deletes row at given index
+    def delete_row(self, index):
+        for i in range(const.SIZE_X):
+            self.board[index * const.SIZE_X + i] = -1
+
+        while index > 0:
+            for i in range(const.SIZE_X):
+                self.board[index * const.SIZE_X + i], self.board[(index - 1) * const.SIZE_X + i] = self.board[(index - 1) * const.SIZE_X + i], self.board[index * const.SIZE_X + i]
+            index -= 1
+
 
     def update(self, isPaused, keyu, keyup, keyl, keyr):
 
@@ -280,6 +295,16 @@ class Board(object):
                         break
 
                 self.update_last()
+
+                for j in range(const.SIZE_Y):
+                    check = True
+                    for i in range(const.SIZE_X):
+                        ind = j * const.SIZE_X + i
+                        if self.board[ind] == -1 or self.board == 7:
+                            check = False
+                            break
+                    if check:
+                        self.delete_row(j)
 
                 # moves block one lower
                 for block in self.shapes[0].get_blocks():
