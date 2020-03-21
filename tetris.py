@@ -145,6 +145,7 @@ class Board(object):
         self.possibleright = True
         self.lastIndexes = [0, 0, 0, 0]
         self.lastshape = 0
+        self.score = 0
 
         first = False
 
@@ -152,7 +153,7 @@ class Board(object):
             self.board.append(-1)
 
         while len(self.shapes) < 4:
-            num = randrange(0, 6)
+            num = randrange(0, 7)
             if len(self.shapes) == 0:
                 self.shapesnums[0] = num
                 self.shapes.append(Shape(self.shapesnums[0], 120, 0))
@@ -165,6 +166,10 @@ class Board(object):
             elif len(self.shapes) == 3:
                 self.shapesnums[3] = num
                 self.shapes.append(Shape(self.shapesnums[3], 520, 600))
+
+    # returns score
+    def get_score(self):
+        return self.score
 
     #returns list of shapes
     def get_shapes(self):
@@ -209,6 +214,7 @@ class Board(object):
     def update(self, isPaused, keyu, keyup, keyl, keyr):
 
         if isPaused:
+            print(self.score)
             for i in range(9):
                 if self.board[i] != -1 and self.board[i] != 7:
                     return False
@@ -226,6 +232,7 @@ class Board(object):
                 else:
                     self.possibleright = True
 
+            # updates board with moving shape and places shape in board if it hit something
             self.clear_board7()
 
             for block in self.shapes[0].get_blocks():
@@ -239,12 +246,12 @@ class Board(object):
 
                         self.shapes.clear()
                         self.shapesnums.pop(0)
-                        self.shapesnums.append(randrange(0, 6))
+                        self.shapesnums.append(randrange(0, 7))
                         self.shapes.append(Shape(self.shapesnums[0], 120, -160))
                         self.shapes.append(Shape(self.shapesnums[1], 520, 240))
                         self.shapes.append(Shape(self.shapesnums[2], 520, 420))
                         self.shapes.append(Shape(self.shapesnums[3], 520, 600))
-
+                        self.score += 100
                         break
 
             if keyu and not self.pressed:
@@ -287,11 +294,12 @@ class Board(object):
 
                         self.shapes.clear()
                         self.shapesnums.pop(0)
-                        self.shapesnums.append(randrange(0, 6))
+                        self.shapesnums.append(randrange(0, 7))
                         self.shapes.append(Shape(self.shapesnums[0], 120, -160))
                         self.shapes.append(Shape(self.shapesnums[1], 520, 240))
                         self.shapes.append(Shape(self.shapesnums[2], 520, 420))
                         self.shapes.append(Shape(self.shapesnums[3], 520, 600))
+                        self.score += 100
 
                         break
 
@@ -307,6 +315,7 @@ class Board(object):
                             check = False
                     if check:
                         self.delete_row(j)
+                        self.score += 1000
 
                 # moves block one lower
                 for block in self.shapes[0].get_blocks():

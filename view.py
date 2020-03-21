@@ -19,6 +19,7 @@ class View(object):
         self.keyu = False
         self.keyr = False
         self.keyup = True
+        self.score = 0
 
         # initialize pygame
         pg.init()
@@ -74,6 +75,10 @@ class View(object):
             self.isPaused = False
         else:
             self.isPaused = True
+
+    # returns score
+    def get_score(self):
+        return self.score
 
     # clears screen
     def clear(self):
@@ -141,6 +146,7 @@ class View(object):
 
     # draws shapes
     def draw_shapes(self):
+        self.score = self.board.get_score()
         if not self.board.update(self.isPaused, self.keyu, self.keyup, self.keyl, self.keyr):
             return False
 

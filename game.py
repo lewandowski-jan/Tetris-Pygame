@@ -17,6 +17,7 @@ def main():
         window.check_events()
         if window.draw_shapes() == False:
             print("YOU LOST!")
+            print("Score: " + str(window.get_score()))
             break
         window.update()
 
