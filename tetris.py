@@ -201,7 +201,8 @@ class Board(object):
 
         while index > 0:
             for i in range(const.SIZE_X):
-                self.board[index * const.SIZE_X + i], self.board[(index - 1) * const.SIZE_X + i] = self.board[(index - 1) * const.SIZE_X + i], self.board[index * const.SIZE_X + i]
+                if self.board[index * const.SIZE_X + i] != 7:
+                    self.board[index * const.SIZE_X + i], self.board[(index - 1) * const.SIZE_X + i] = self.board[(index - 1) * const.SIZE_X + i], self.board[index * const.SIZE_X + i]
             index -= 1
 
 
@@ -300,9 +301,10 @@ class Board(object):
                     check = True
                     for i in range(const.SIZE_X):
                         ind = j * const.SIZE_X + i
-                        if self.board[ind] == -1 or self.board == 7:
+                        if self.board[ind] == -1:
                             check = False
-                            break
+                        if self.board[ind] == 7:
+                            check = False
                     if check:
                         self.delete_row(j)
 
