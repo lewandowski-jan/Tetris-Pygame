@@ -143,6 +143,7 @@ class Board(object):
         self.pressed = False
         self.possibleleft = True
         self.possibleright = True
+        self.possibledown = True
         self.lastIndexes = [0, 0, 0, 0]
         self.lastshape = 0
         self.score = 0
@@ -210,8 +211,7 @@ class Board(object):
                     self.board[index * const.SIZE_X + i], self.board[(index - 1) * const.SIZE_X + i] = self.board[(index - 1) * const.SIZE_X + i], self.board[index * const.SIZE_X + i]
             index -= 1
 
-
-    def update(self, isPaused, keyu, keyup, keyl, keyr):
+    def update(self, isPaused, keyu, keyup, keyl, keyr, keyd):
 
         if isPaused:
             print(self.score)
@@ -226,11 +226,19 @@ class Board(object):
                 else:
                     self.possibleleft = True
 
+            for block in self.shapes[0].get_blocks():
                 if block.get_x() >= 361:
                     self.possibleright = False
                     break
                 else:
                     self.possibleright = True
+
+            for block in self.shapes[0].get_blocks():
+                if block.get_y() >= const.WIN_HEIGHT - const.GRID:
+                    self.possibledown = False
+                    break
+                else:
+                    self.possibledown = True
 
             # updates board with moving shape and places shape in board if it hit something
             self.clear_board7()
@@ -276,6 +284,13 @@ class Board(object):
                 self.shapes[0].set_x(self.shapes[0].get_x() + const.GRID)
                 self.pressed = True
 
+            if keyd and not self.pressed and self.possibledown:
+                for block in self.shapes[0].get_blocks():
+                    block.set_y(block.get_y() + const.GRID)
+                self.shapes[0].set_y(self.shapes[0].get_y() + const.GRID)
+                self.update_last()
+                self.pressed = True
+
             if keyup:
                 self.pressed = False
 
@@ -285,7 +300,7 @@ class Board(object):
                 for block in self.shapes[0].get_blocks():
 
                     # when shape hits bottom
-                    if block.get_y() == const.WIN_HEIGHT - const.GRID:
+                    if block.get_y() >= const.WIN_HEIGHT - const.GRID:
 
                         for i in range(const.SIZE_X):
                             for j in range(const.SIZE_Y):

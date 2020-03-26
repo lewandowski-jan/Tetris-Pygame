@@ -18,6 +18,7 @@ class View(object):
         self.keyl = False
         self.keyu = False
         self.keyr = False
+        self.keyd = False
         self.keyup = True
         self.score = 0
 
@@ -109,10 +110,14 @@ class View(object):
                 if event.key == pg.K_RIGHT:
                     self.keyr = True
                     self.keyup = False
+                if event.key == pg.K_DOWN:
+                    self.keyd = True
+                    self.keyup = False
             elif event.type == pg.KEYUP:
                 self.keyl = False
                 self.keyu = False
                 self.keyr = False
+                self.keyd = False
                 self.keyup = True
 
     # draws ui
@@ -147,7 +152,7 @@ class View(object):
     # draws shapes
     def draw_shapes(self):
         self.score = self.board.get_score()
-        if not self.board.update(self.isPaused, self.keyu, self.keyup, self.keyl, self.keyr):
+        if not self.board.update(self.isPaused, self.keyu, self.keyup, self.keyl, self.keyr, self.keyd):
             return False
 
         for shape in self.board.get_shapes():
