@@ -19,7 +19,7 @@ class Button(object):
         pg.draw.rect(screen, self.color, self.rect)
         (mx, my) = pg.mouse.get_pos()
 
-        if ispaused:
+        if not ispaused:
             self.color = (100, 100, 100)
             self.text = self.font.render("PAUSE", True, const.BLACK)
         else:

@@ -15,10 +15,7 @@ def main():
         window.clear()
         window.ui()
         window.check_events()
-        if window.draw_shapes() == False:
-            print("YOU LOST!")
-            print("Score: " + str(window.get_score()))
-            break
+        window.draw_shapes()
         window.update()
 
 if __name__ == "__main__":

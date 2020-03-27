@@ -2,6 +2,8 @@ import pygame as pg
 import const
 import tetris
 import button
+from tkinter import *
+from tkinter import messagebox
 
 class View(object):
     # constructor
@@ -12,7 +14,7 @@ class View(object):
         self.running = True
         self.mouseDown = False
         self.mouseUp = True
-        self.isPaused = False
+        self.isPaused = True
         self.clicked = False
         self.board = tetris.Board()
         self.keyl = False
@@ -153,7 +155,10 @@ class View(object):
     def draw_shapes(self):
         self.score = self.board.get_score()
         if not self.board.update(self.isPaused, self.keyu, self.keyup, self.keyl, self.keyr, self.keyd):
-            return False
+            Tk().wm_withdraw()
+            messagebox.showinfo('You lost!', "Score: " + str(self.score))
+            self.board.restart()
+            self.isPaused = True
 
         for shape in self.board.get_shapes():
             for block in shape.get_blocks():

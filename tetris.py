@@ -147,8 +147,38 @@ class Board(object):
         self.lastIndexes = [0, 0, 0, 0]
         self.lastshape = 0
         self.score = 0
+        self.touched = False
 
-        first = False
+        for i in range(const.SIZE_Y * const.SIZE_X):
+            self.board.append(-1)
+
+        while len(self.shapes) < 4:
+            num = randrange(0, 7)
+            if len(self.shapes) == 0:
+                self.shapesnums[0] = num
+                self.shapes.append(Shape(self.shapesnums[0], 120, 0))
+            elif len(self.shapes) == 1:
+                self.shapesnums[1] = num
+                self.shapes.append(Shape(self.shapesnums[1], 520, 240))
+            elif len(self.shapes) == 2:
+                self.shapesnums[2] = num
+                self.shapes.append(Shape(self.shapesnums[2], 520, 420))
+            elif len(self.shapes) == 3:
+                self.shapesnums[3] = num
+                self.shapes.append(Shape(self.shapesnums[3], 520, 600))
+
+    #restarts game
+    def restart(self):
+        self.shapes = []
+        self.board = []
+        self.pressed = False
+        self.possibleleft = True
+        self.possibleright = True
+        self.possibledown = True
+        self.lastIndexes = [0, 0, 0, 0]
+        self.lastshape = 0
+        self.score = 0
+        self.Touched = False
 
         for i in range(const.SIZE_Y * const.SIZE_X):
             self.board.append(-1)
@@ -211,10 +241,74 @@ class Board(object):
                     self.board[index * const.SIZE_X + i], self.board[(index - 1) * const.SIZE_X + i] = self.board[(index - 1) * const.SIZE_X + i], self.board[index * const.SIZE_X + i]
             index -= 1
 
+    # updates board with moving shape, places shape in board if it hit something and returns True if so else False
+    def update_board(self):
+        self.clear_board7()
+
+        for block in self.shapes[0].get_blocks():
+            index = int((block.get_y() / const.GRID) * const.SIZE_X + (block.get_x() - 1) / const.GRID)
+            if 0 <= index < const.SIZE_X * const.SIZE_Y:
+                if self.board[index] == -1:
+                    self.board[index] = 7
+                else:
+                    for ind in self.lastIndexes:
+                        self.board[ind] = self.lastshape
+
+                    self.shapes.clear()
+                    self.shapesnums.pop(0)
+                    self.shapesnums.append(randrange(0, 7))
+                    self.shapes.append(Shape(self.shapesnums[0], 120, -160))
+                    self.shapes.append(Shape(self.shapesnums[1], 520, 240))
+                    self.shapes.append(Shape(self.shapesnums[2], 520, 420))
+                    self.shapes.append(Shape(self.shapesnums[3], 520, 600))
+                    self.score += 100
+                    return True
+                    break
+        return False
+
+    # checks if block hits ground
+    def check_ground(self):
+        for block in self.shapes[0].get_blocks():
+
+            # when shape hits ground
+            if block.get_y() == const.WIN_HEIGHT - const.GRID:
+
+                for i in range(const.SIZE_X):
+                    for j in range(const.SIZE_Y):
+                        if self.board[j * const.SIZE_X + i] == 7:
+                            self.board[j * const.SIZE_X + i] = self.shapes[0].get_shape()
+
+                self.shapes.clear()
+                self.shapesnums.pop(0)
+                self.shapesnums.append(randrange(0, 7))
+                self.shapes.append(Shape(self.shapesnums[0], 120, -160))
+                self.shapes.append(Shape(self.shapesnums[1], 520, 240))
+                self.shapes.append(Shape(self.shapesnums[2], 520, 420))
+                self.shapes.append(Shape(self.shapesnums[3], 520, 600))
+                self.score += 100
+
+                break
+
+    def check_row(self):
+        for j in range(const.SIZE_Y):
+            check = True
+            for i in range(const.SIZE_X):
+                ind = j * const.SIZE_X + i
+                if self.board[ind] == -1:
+                    check = False
+                if self.board[ind] == 7:
+                    check = False
+            if check:
+                self.delete_row(j)
+                self.score += 1000
+
     def update(self, isPaused, keyu, keyup, keyl, keyr, keyd):
 
-        if isPaused:
-            print(self.score)
+        if not isPaused:
+            self.update_last()
+            self.update_board()
+            self.check_ground()
+
             for i in range(9):
                 if self.board[i] != -1 and self.board[i] != 7:
                     return False
@@ -240,45 +334,19 @@ class Board(object):
                 else:
                     self.possibledown = True
 
-            # updates board with moving shape and places shape in board if it hit something
-            self.clear_board7()
-
-            for block in self.shapes[0].get_blocks():
-                index = int((block.get_y() / const.GRID) * const.SIZE_X + (block.get_x() - 1) / const.GRID)
-                if 0 <= index < const.SIZE_X * const.SIZE_Y:
-                    if self.board[index] == -1:
-                        self.board[index] = 7
-                    else:
-                        for ind in self.lastIndexes:
-                            self.board[ind] = self.lastshape
-
-                        self.shapes.clear()
-                        self.shapesnums.pop(0)
-                        self.shapesnums.append(randrange(0, 7))
-                        self.shapes.append(Shape(self.shapesnums[0], 120, -160))
-                        self.shapes.append(Shape(self.shapesnums[1], 520, 240))
-                        self.shapes.append(Shape(self.shapesnums[2], 520, 420))
-                        self.shapes.append(Shape(self.shapesnums[3], 520, 600))
-                        self.score += 100
-                        break
+            self.update_last()
 
             if keyu and not self.pressed:
-                self.update_last()
-
                 self.shapes[0].turn()
                 self.pressed = True
 
             if keyl and not self.pressed and self.possibleleft:
-                self.update_last()
-
                 for block in self.shapes[0].get_blocks():
                     block.set_x(block.get_x() - const.GRID)
                 self.shapes[0].set_x(self.shapes[0].get_x() - const.GRID)
                 self.pressed = True
 
             if keyr and not self.pressed and self.possibleright:
-                self.update_last()
-
                 for block in self.shapes[0].get_blocks():
                     block.set_x(block.get_x() + const.GRID)
                 self.shapes[0].set_x(self.shapes[0].get_x() + const.GRID)
@@ -288,55 +356,27 @@ class Board(object):
                 for block in self.shapes[0].get_blocks():
                     block.set_y(block.get_y() + const.GRID)
                 self.shapes[0].set_y(self.shapes[0].get_y() + const.GRID)
-                self.update_last()
                 self.pressed = True
 
             if keyup:
                 self.pressed = False
 
+            self.update_board()
+            self.check_ground()
+
             global count
             count += 1
+
             if count >= const.FPS/4:
-                for block in self.shapes[0].get_blocks():
-
-                    # when shape hits bottom
-                    if block.get_y() >= const.WIN_HEIGHT - const.GRID:
-
-                        for i in range(const.SIZE_X):
-                            for j in range(const.SIZE_Y):
-                                if self.board[j * const.SIZE_X + i] == 7:
-                                    self.board[j * const.SIZE_X + i] = self.shapes[0].get_shape()
-
-                        self.shapes.clear()
-                        self.shapesnums.pop(0)
-                        self.shapesnums.append(randrange(0, 7))
-                        self.shapes.append(Shape(self.shapesnums[0], 120, -160))
-                        self.shapes.append(Shape(self.shapesnums[1], 520, 240))
-                        self.shapes.append(Shape(self.shapesnums[2], 520, 420))
-                        self.shapes.append(Shape(self.shapesnums[3], 520, 600))
-                        self.score += 100
-
-                        break
-
-                self.update_last()
-
-                for j in range(const.SIZE_Y):
-                    check = True
-                    for i in range(const.SIZE_X):
-                        ind = j * const.SIZE_X + i
-                        if self.board[ind] == -1:
-                            check = False
-                        if self.board[ind] == 7:
-                            check = False
-                    if check:
-                        self.delete_row(j)
-                        self.score += 1000
-
-                # moves block one lower
+                # moves shape one lower
                 for block in self.shapes[0].get_blocks():
                     block.set_y(block.get_y() + const.GRID)
                 self.shapes[0].set_y(self.shapes[0].get_y() + const.GRID)
 
+                self.check_row()
+
                 count = 0
+
+                self.update_board()
 
         return True
